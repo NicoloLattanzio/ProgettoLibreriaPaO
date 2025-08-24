@@ -2,20 +2,15 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidget>
+#include <QVBoxLayout>
+#include <QStackedWidget>
 #include "persistence/DatabaseManager.h"
+#include "ADDItemWidget.h"
+#include "model/Item.h"
+#include "edititemwidget.h"
 
-// Forward declarations
-class QListWidget;
-class QLabel;
-class QLineEdit;
-class QSplitter;
-class QPushButton;
-class QListWidgetItem;
-class QStackedWidget; // Aggiunto
-class ADDItemWidget;
-
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -23,33 +18,38 @@ public:
     ~MainWindow();
 
 private slots:
-    void onSearchTextChanged(const QString& text);
-    void onListItemClicked(QListWidgetItem* item);
-
-    // Slot per la nuova logica
     void showAddPage();
     void showListPage();
     void saveNewItem();
+    void onSearchTextChanged(const QString& text);
+    void onListItemClicked(QListWidgetItem* item);
+    void DeleteOnClick();
+    void ShowEditPage();
+    void saveEditedItem();
 
 private:
     void setupUi();
     void loadItemsFromDatabase();
     void populateListWidget();
-    QString getItemDetails(Library::Item* item);
+
 
     DatabaseManager& m_dbManager;
-    QVector<Library::Item*> m_items;
+    QList<Library::Item*> m_items;
 
-    // Widget della UI
-    QStackedWidget *m_stackedWidget; // Il nostro contenitore di pagine
-    QWidget *m_listPage;             // La pagina con la lista
-    ADDItemWidget *m_addItemWidget;  // La pagina di aggiunta
+    QLineEdit* searchLineEdit;
+    QPushButton* m_addButton;
+    QPushButton* m_editButton;
+    QPushButton* m_deleteButton;
 
-    QListWidget *itemsListWidget;
-    QLabel *detailsLabel;
-    QLineEdit *searchLineEdit;
-    QPushButton *m_addButton;
-    QPushButton *m_editButton;
+    QStackedWidget* m_stackedWidget;
+    QWidget* m_listPage;
+    ADDItemWidget* m_addItemWidget;
+    QListWidget* itemsListWidget;
+    EditItemWidget* m_editItemWidget;
+
+    // pannello di destra
+    QWidget* rightPanel;
+    QVBoxLayout* detailsLayout;
 };
 
 #endif // MAINWINDOW_H

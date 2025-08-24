@@ -1,9 +1,10 @@
-QT += core gui sql
+QT += core gui sql multimedia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 
 SOURCES += \
     ADDItemWidget.cpp \
+    edititemwidget.cpp \
     main.cpp \
     mainwindow.cpp \
     guivisitor.cpp \
@@ -16,6 +17,7 @@ SOURCES += \
 
 HEADERS += \
     ADDItemWidget.h \
+    edititemwidget.h \
     mainwindow.h \
     guivisitor.h \
     persistence/DatabaseManager.h \

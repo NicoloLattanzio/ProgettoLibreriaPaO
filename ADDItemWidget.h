@@ -36,7 +36,6 @@ signals: // <-- SEZIONE MANCANTE O SCRITTA MALE
 
 private slots:
     void onTypeChanged(int index);
-    void imageLoaded();
 
 private:
     void setupCommonFields();
