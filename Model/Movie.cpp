@@ -4,8 +4,8 @@
 namespace Library {
 
    Movie::Movie(String author, String title, unsigned int itemid, String genre, unsigned int year, String image,
-              String language, unsigned int MinAge, unsigned int duration,bool oscar):Item(author, title, itemid, genre, year,
-                                                                            image), language(language), MinAge(MinAge), duration(duration), oscar(oscar)  {}
+              String language, unsigned int MinAge, unsigned int duration,bool oscar, String trailer):Item(author, title, itemid, genre, year,
+                                                                            image), language(language), MinAge(MinAge), duration(duration), oscar(oscar), trailer(trailer)  {}
 
 
 
@@ -22,6 +22,10 @@ namespace Library {
   }
   bool Movie::getOscar() const {
     return oscar;
+  }
+
+  const String& Movie::getTrailer() const {
+    return trailer;
   }
 
   Movie& Movie::setLanguage(const String& language) {
@@ -41,6 +45,11 @@ namespace Library {
 
   Movie& Movie::setOscar(bool oscar) {
     this->oscar = oscar;
+    return *this;
+  }
+
+  Movie& Movie::setTrailer(const String& trailer) {
+    this->trailer = trailer;
     return *this;
   }
 

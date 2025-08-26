@@ -11,10 +11,11 @@ namespace Library {
       unsigned int MinAge;
       unsigned int duration;
       bool oscar;
+      String trailer;
 
     public:
       Movie(String author, String title, unsigned int itemid, String genre, unsigned int year, String image,
-           String language,unsigned int MinAge, unsigned int duration, bool oscar);
+           String language,unsigned int MinAge, unsigned int duration, bool oscar, String trailer);
       Movie() = default;
       virtual void accept(ItemsVisitor::Visitor& visitor) override;
       virtual void accept(ItemsVisitor::ConstVisitor& constVisitor) const override;
@@ -23,11 +24,13 @@ namespace Library {
       unsigned int getMinAge() const;
       unsigned int getDuration() const;
       bool getOscar() const;
+      const String& getTrailer() const;
 
       Movie& setLanguage(const String& language);
       Movie& setMinAge(unsigned int album);
       Movie& setDuration(unsigned int duration);
       Movie& setOscar(bool oscar);
+      Movie& setTrailer(const String& trailer);
 
   };
 

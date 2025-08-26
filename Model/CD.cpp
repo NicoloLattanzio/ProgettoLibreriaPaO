@@ -4,8 +4,8 @@
 namespace Library {
 
    CD::CD(String author, String title, unsigned int itemid, String genre, unsigned int year, String image,
-              String language, String album, unsigned int duration):Item(author, title, itemid, genre, year,
-                                                                            image), language(language), album(album), duration(duration)  {}
+              String language, String album, unsigned int duration, String audioTrack):Item(author, title, itemid, genre, year,
+                                                                            image), language(language), album(album), duration(duration), audioTrack(audioTrack) {}
 
 
 
@@ -21,6 +21,10 @@ namespace Library {
     return duration;
   }
 
+  const String& CD::getaudioTrack() const{
+      return audioTrack;
+  }
+
   CD& CD::setLanguage(const String& language) {
     this->language = language;
     return *this;
@@ -34,6 +38,9 @@ namespace Library {
   CD& CD::setDuration(unsigned int duration) {
     this->duration = duration;
     return *this;
+  }
+  void CD::setAudioTrack(const String& audioTrack) {
+      this->audioTrack = audioTrack;
   }
 
 
