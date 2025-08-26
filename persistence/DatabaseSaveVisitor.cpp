@@ -51,13 +51,14 @@ void DatabaseSaveVisitor::visit(const Library::Movie& movie) {
 void DatabaseSaveVisitor::visit(const Library::CD& cd) {
     QSqlQuery query;
     query.prepare(
-        "INSERT OR REPLACE INTO CDs (item_id, language, album, duration) "
-        "VALUES (:id, :language, :album, :duration)"
+        "INSERT OR REPLACE INTO CDs (item_id, language, album, duration, audio_track) "
+        "VALUES (:id, :language, :album, :duration, :audio_track)"
     );
     query.bindValue(":id", m_itemId);
     query.bindValue(":language", QString::fromStdString(cd.getLanguage()));
     query.bindValue(":album", QString::fromStdString(cd.getAlbum()));
     query.bindValue(":duration", cd.getDuration());
+    query.bindValue(":audio_track", QString::fromStdString(cd.getaudioTrack()));
 
     qDebug() << "Visitor: Saving CD data for item ID:" << m_itemId;
     if (!query.exec()) {

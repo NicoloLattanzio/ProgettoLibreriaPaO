@@ -83,6 +83,7 @@ bool DatabaseManager::initialize(const QString& path) {
         "   language TEXT,"
         "   album TEXT,"
         "   duration INTEGER,"
+        "   audio_track TEXT,"
         "   FOREIGN KEY(item_id) REFERENCES Items(id) ON DELETE CASCADE"
         ");"
     );
@@ -242,10 +243,11 @@ QVector<Library::Item*> DatabaseManager::loadAllItems() {
             unsigned int minAge = typeQuery.value("min_age").toUInt();
             unsigned int duration = typeQuery.value("duration").toUInt();
             bool oscar = typeQuery.value("oscar").toBool();
+            std::string trailer = typeQuery.value("trailer").toString().toStdString();
 
             items.append(new Library::Movie(
                 author, title, id, genre, year, image,
-                language, minAge, duration, oscar
+                language, minAge, duration, oscar, trailer
             ));
             continue;
         }
@@ -257,10 +259,11 @@ QVector<Library::Item*> DatabaseManager::loadAllItems() {
             std::string language = typeQuery.value("language").toString().toStdString();
             std::string album = typeQuery.value("album").toString().toStdString();
             unsigned int duration = typeQuery.value("duration").toUInt();
+            std::string audioTrack = typeQuery.value("audio_track").toString().toStdString();
 
             items.append(new Library::CD(
                 author, title, id, genre, year, image,
-                language, album, duration
+                language, album, duration, audioTrack
             ));
             continue;
         }
