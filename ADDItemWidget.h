@@ -55,10 +55,13 @@ private:
     QLineEdit *m_publisherEdit, *m_translatorEdit;
     QSpinBox *m_pagesEdit;
     QLineEdit *m_movieLanguageEdit;
+    QLineEdit *m_movieTrailerEdit;
     QSpinBox *m_minAgeEdit, *m_durationMovieEdit;
     QCheckBox *m_oscarCheckBox;
     QLineEdit *m_cdLanguageEdit, *m_albumEdit;
     QSpinBox *m_durationCDEdit;
+    QLineEdit *m_audioTrackEdit;
+    QLineEdit *m_trailer;
 
     // Logica Interna
     QVector<Library::Item*> m_prototypes;

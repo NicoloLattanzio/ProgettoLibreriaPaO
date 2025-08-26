@@ -109,23 +109,27 @@ void EditItemWidget::createSpecificFields() {
     m_minAgeEdit = new QSpinBox(m_movieFields);
     m_durationMovieEdit = new QSpinBox(m_movieFields);
     m_oscarCheckBox = new QCheckBox(m_movieFields);
+    m_movieTrailerEdit = new QLineEdit(m_movieFields);
     m_durationMovieEdit->setRange(1, 600);
     movieLayout->addRow("Lingua:", m_movieLanguageEdit);
     movieLayout->addRow("Età Minima:", m_minAgeEdit);
     movieLayout->addRow("Durata (min):", m_durationMovieEdit);
     movieLayout->addRow("Vincitore Oscar:", m_oscarCheckBox);
+
+    movieLayout->addRow("Trailer:", m_movieTrailerEdit);
     mainLayout->addWidget(m_movieFields);
 
-    // Campi specifici per CD
     m_cdFields = new QWidget(this);
     QFormLayout* cdLayout = new QFormLayout(m_cdFields);
     m_cdLanguageEdit = new QLineEdit(m_cdFields);
     m_albumEdit = new QLineEdit(m_cdFields);
     m_durationCDEdit = new QSpinBox(m_cdFields);
+    m_audioTrackEdit = new QLineEdit(m_cdFields);
     m_durationCDEdit->setRange(1, 300);
     cdLayout->addRow("Lingua:", m_cdLanguageEdit);
     cdLayout->addRow("Album:", m_albumEdit);
     cdLayout->addRow("Durata (min):", m_durationCDEdit);
+    cdLayout->addRow("Traccia Audio:", m_audioTrackEdit);
     mainLayout->addWidget(m_cdFields);
 }
 
@@ -183,12 +187,15 @@ Library::Item* EditItemWidget::getUpdatedItem() const {
                                   m_movieLanguageEdit->text().toStdString(),
                                   m_minAgeEdit->value(),
                                   m_durationMovieEdit->value(),
-                                  m_oscarCheckBox->isChecked());
+                                  m_oscarCheckBox->isChecked(),
+                                  m_movieTrailerEdit->text().toStdString());
+
     } else if (typeIndex == 2) { // CD
         return new Library::CD(author, title, id, genre, year, image,
                                m_cdLanguageEdit->text().toStdString(),
                                m_albumEdit->text().toStdString(),
-                               m_durationCDEdit->value());
+                               m_durationCDEdit->value(),
+                               m_audioTrackEdit->text().toStdString());
     }
     return nullptr;
 }
@@ -210,6 +217,7 @@ void EditItemWidget::visit(const Library::Movie& movie) {
     m_minAgeEdit->setValue(movie.getMinAge());
     m_durationMovieEdit->setValue(movie.getDuration());
     m_oscarCheckBox->setChecked(movie.getOscar());
+    m_movieTrailerEdit->setText(QString::fromStdString(movie.getTrailer()));
 
     showSpecificFields(1);
 }
@@ -220,6 +228,7 @@ void EditItemWidget::visit(const Library::CD& cd) {
     m_cdLanguageEdit->setText(QString::fromStdString(cd.getLanguage()));
     m_albumEdit->setText(QString::fromStdString(cd.getAlbum()));
     m_durationCDEdit->setValue(cd.getDuration());
+    m_audioTrackEdit->setText(QString::fromStdString(cd.getaudioTrack()));
 
     showSpecificFields(2);
 }

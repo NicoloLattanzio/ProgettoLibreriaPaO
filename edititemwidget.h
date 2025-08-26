@@ -67,12 +67,15 @@ private:
     QSpinBox *m_minAgeEdit;
     QSpinBox *m_durationMovieEdit;
     QCheckBox *m_oscarCheckBox;
+    QLineEdit *m_trailer;
+    QLineEdit *m_movieTrailerEdit;
 
     // Campi specifici per CD
     QWidget *m_cdFields;
     QLineEdit *m_cdLanguageEdit;
     QLineEdit *m_albumEdit;
     QSpinBox *m_durationCDEdit;
+    QLineEdit *m_audioTrackEdit;
 
     // Pulsanti
     QPushButton *m_saveButton;

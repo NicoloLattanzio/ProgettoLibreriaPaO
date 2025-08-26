@@ -106,12 +106,14 @@ Library::Item* ADDItemWidget::createItem() {
                                   m_movieLanguageEdit->text().toStdString(),
                                   m_minAgeEdit->value(),
                                   m_durationMovieEdit->value(),
-                                  m_oscarCheckBox->isChecked());
+                                  m_oscarCheckBox->isChecked(),
+                                  m_movieTrailerEdit->text().toStdString());
     } else if (typeIndex == 2) { // CD
         return new Library::CD(author, title, 0, genre, year, image,
                                m_cdLanguageEdit->text().toStdString(),
                                m_albumEdit->text().toStdString(),
-                               m_durationCDEdit->value());
+                               m_durationCDEdit->value(),
+                               m_audioTrackEdit->text().toStdString());
     }
     return nullptr;
 }
@@ -156,6 +158,7 @@ void ADDItemWidget::createSpecificFields() {
     m_movieFields = new QWidget(this);
     QFormLayout* movieLayout = new QFormLayout(m_movieFields);
     m_movieLanguageEdit = new QLineEdit(m_movieFields);
+    m_movieTrailerEdit = new QLineEdit(m_movieFields);
     m_minAgeEdit = new QSpinBox(m_movieFields);
     m_durationMovieEdit = new QSpinBox(m_movieFields);
     m_oscarCheckBox = new QCheckBox(m_movieFields);
@@ -164,6 +167,7 @@ void ADDItemWidget::createSpecificFields() {
     movieLayout->addRow("Età Minima:", m_minAgeEdit);
     movieLayout->addRow("Durata (min):", m_durationMovieEdit);
     movieLayout->addRow("Vincitore Oscar:", m_oscarCheckBox);
+    movieLayout->addRow("Trailer:", m_movieTrailerEdit);
     mainLayout->addWidget(m_movieFields);
 
     m_cdFields = new QWidget(this);
@@ -171,9 +175,11 @@ void ADDItemWidget::createSpecificFields() {
     m_cdLanguageEdit = new QLineEdit(m_cdFields);
     m_albumEdit = new QLineEdit(m_cdFields);
     m_durationCDEdit = new QSpinBox(m_cdFields);
+    m_audioTrackEdit = new QLineEdit(m_cdFields);
     m_durationCDEdit->setRange(1, 300);
     cdLayout->addRow("Lingua:", m_cdLanguageEdit);
     cdLayout->addRow("Album:", m_albumEdit);
     cdLayout->addRow("Durata (min):", m_durationCDEdit);
+    cdLayout->addRow("Traccia Audio:", m_audioTrackEdit);
     mainLayout->addWidget(m_cdFields);
 }

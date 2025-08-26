@@ -184,26 +184,6 @@ void MainWindow::saveNewItem() {
     }
 }
 
-/*void MainWindow::ModifyOnClick(){
-    QListWidgetItem* currentItem = itemsListWidget->currentItem();
-
-    if (!currentItem) {
-        QMessageBox::information(this, "Info", "Nessun elemento selezionato.");
-        return;
-    }
-
-    if (currentItem) {
-        if (m_dbManager.saveItem(currentItem)) {
-            QMessageBox::information(this, "Successo", "Item aggiunto correttamente.");
-            loadItemsFromDatabase();
-            showListPage();
-        } else {
-            QMessageBox::warning(this, "Errore Database", "Impossibile salvare l'item.");
-        }
-        delete newItem;
-    }
-}*/
-
 void MainWindow::onSearchTextChanged(const QString& text) {
     for (int i = 0; i < itemsListWidget->count(); ++i) {
         QListWidgetItem* item = itemsListWidget->item(i);

@@ -6,17 +6,17 @@
 #include <QFormLayout>
 #include <QCoreApplication>
 #include <QMediaPlayer>
-
+#include <QAudioOutput>
+#include <QPushButton>
+#include <QSlider>
+#include <QFileInfo>
+#include <QObject>
 
 GUIVisitor::GUIVisitor()
     : resultWidget(new QWidget()),
       mainLayout(new QVBoxLayout())
 {
     resultWidget->setLayout(mainLayout);
-}
-
-QWidget* GUIVisitor::getResultWidget() const {
-    return resultWidget;
 }
 
 void GUIVisitor::clear() {
@@ -96,6 +96,7 @@ void GUIVisitor::visit(const Library::CD& cd) {
     clear();
 
     QHBoxLayout* hLayout = new QHBoxLayout();
+
     QString path = QCoreApplication::applicationDirPath() + "/images/" +
                    QString::fromStdString(cd.getImage());
     QLabel* imageLabel = new QLabel;
@@ -118,6 +119,70 @@ void GUIVisitor::visit(const Library::CD& cd) {
     QWidget* formWidget = new QWidget;
     formWidget->setLayout(form);
     hLayout->addWidget(formWidget);
+
+    // Aggiungi il player musicale solo se il CD ha una traccia audio
+    if (!cd.getaudioTrack().empty()) {
+        QVBoxLayout* playerLayout = new QVBoxLayout();
+
+        // Crea il player multimediale
+        QMediaPlayer* player = new QMediaPlayer(resultWidget);
+        QAudioOutput* audioOutput = new QAudioOutput(resultWidget);
+        player->setAudioOutput(audioOutput);
+
+        // Imposta il volume a un livello ragionevole
+        audioOutput->setVolume(50);
+
+        // Costruisci il percorso del file audio
+        QString audioPath = QCoreApplication::applicationDirPath() + "/audio/" +
+                           QString::fromStdString(cd.getaudioTrack());
+
+        // Verifica se il file esiste
+        if (QFileInfo::exists(audioPath)) {
+            player->setSource(QUrl::fromLocalFile(audioPath));
+
+            // Crea i controlli del player
+            QSlider* progressSlider = new QSlider(Qt::Horizontal);
+            progressSlider->setRange(0, 100);
+
+            QPushButton* playButton = new QPushButton("Play");
+            QPushButton* pauseButton = new QPushButton("Pause");
+            QPushButton* stopButton = new QPushButton("Stop");
+
+            // Layout per i pulsanti
+            QHBoxLayout* buttonLayout = new QHBoxLayout();
+            buttonLayout->addWidget(playButton);
+            buttonLayout->addWidget(pauseButton);
+            buttonLayout->addWidget(stopButton);
+
+            // Connetti i pulsanti alle funzioni del player
+            connect(playButton, &QPushButton::clicked, player, &QMediaPlayer::play);
+            connect(pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
+            connect(stopButton, &QPushButton::clicked, player, &QMediaPlayer::stop);
+
+            // Aggiorna lo slider durante la riproduzione
+            connect(player, &QMediaPlayer::positionChanged, this, [=](qint64 position) {
+                if (player->duration() > 0) {
+                    progressSlider->setValue(static_cast<int>((position * 100) / player->duration()));
+                }
+            });
+
+            // Permetti di cercare una posizione con lo slider
+            connect(progressSlider, &QSlider::sliderMoved, player, [=](int value) {
+                if (player->duration() > 0) {
+                    player->setPosition((value * player->duration()) / 100);
+                }
+            });
+
+            // Aggiungi i controlli al layout
+            playerLayout->addWidget(new QLabel("Riproduci traccia:"));
+            playerLayout->addWidget(progressSlider);
+            playerLayout->addLayout(buttonLayout);
+        } else {
+            playerLayout->addWidget(new QLabel("File audio non trovato: " + audioPath));
+        }
+
+        hLayout->addLayout(playerLayout);
+    }
 
     mainLayout->addLayout(hLayout);
 }
