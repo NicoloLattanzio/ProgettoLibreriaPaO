@@ -101,6 +101,7 @@ Library::Item* ADDItemWidget::createItem() {
                                  m_publisherEdit->text().toStdString(),
                                  m_translatorEdit->text().toStdString(),
                                  m_pagesEdit->value());
+
     } else if (typeIndex == 1) { // Film
         return new Library::Movie(author, title, 0, genre, year, image,
                                   m_movieLanguageEdit->text().toStdString(),
@@ -108,6 +109,7 @@ Library::Item* ADDItemWidget::createItem() {
                                   m_durationMovieEdit->value(),
                                   m_oscarCheckBox->isChecked(),
                                   m_movieTrailerEdit->text().toStdString());
+
     } else if (typeIndex == 2) { // CD
         return new Library::CD(author, title, 0, genre, year, image,
                                m_cdLanguageEdit->text().toStdString(),

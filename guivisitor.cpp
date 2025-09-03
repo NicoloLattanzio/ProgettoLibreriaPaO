@@ -11,6 +11,9 @@
 #include <QSlider>
 #include <QFileInfo>
 #include <QObject>
+#include <QVideoWidget>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 GUIVisitor::GUIVisitor()
     : resultWidget(new QWidget()),
@@ -88,6 +91,75 @@ void GUIVisitor::visit(const Library::Movie& movie) {
     QWidget* formWidget = new QWidget;
     formWidget->setLayout(form);
     hLayout->addWidget(formWidget);
+
+    // Aggiungi il player video solo se il film ha un trailer
+    if (!movie.getTrailer().empty()) {
+        QVBoxLayout* videoLayout = new QVBoxLayout();
+
+        // Crea il player multimediale per video
+        QMediaPlayer* player = new QMediaPlayer(resultWidget);
+        QVideoWidget* videoWidget = new QVideoWidget(resultWidget);
+        player->setVideoOutput(videoWidget);
+
+        // Costruisci il percorso del file video
+        QString videoPath = QCoreApplication::applicationDirPath() + "/trailer/" +
+                           QString::fromStdString(movie.getTrailer());
+
+        // Verifica se il file esiste
+        if (QFileInfo::exists(videoPath)) {
+            player->setSource(QUrl::fromLocalFile(videoPath));
+
+            // Crea i controlli del player
+            QSlider* progressSlider = new QSlider(Qt::Horizontal);
+            progressSlider->setRange(0, 100);
+
+            QPushButton* playButton = new QPushButton("Play");
+            QPushButton* pauseButton = new QPushButton("Pause");
+            QPushButton* stopButton = new QPushButton("Stop");
+
+            // Layout per i pulsanti
+            QHBoxLayout* buttonLayout = new QHBoxLayout();
+            buttonLayout->addWidget(playButton);
+            buttonLayout->addWidget(pauseButton);
+            buttonLayout->addWidget(stopButton);
+
+            // Connetti i pulsanti alle funzioni del player
+            connect(playButton, &QPushButton::clicked, player, &QMediaPlayer::play);
+            connect(pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
+            connect(stopButton, &QPushButton::clicked, [player, progressSlider]() {
+                player->stop();
+                player->setPosition(0);
+                progressSlider->setValue(0);
+            });
+
+            // Aggiorna lo slider durante la riproduzione
+            connect(player, &QMediaPlayer::positionChanged, this, [=](qint64 position) {
+                if (player->duration() > 0) {
+                    progressSlider->setValue(static_cast<int>((position * 100) / player->duration()));
+                }
+            });
+
+            // Permetti di cercare una posizione con lo slider
+            connect(progressSlider, &QSlider::sliderMoved, player, [=](int value) {
+                if (player->duration() > 0) {
+                    player->setPosition((value * player->duration()) / 100);
+                }
+            });
+
+            // Aggiungi i controlli al layout
+            videoLayout->addWidget(new QLabel("Trailer:"));
+            videoLayout->addWidget(videoWidget);
+            videoLayout->addWidget(progressSlider);
+            videoLayout->addLayout(buttonLayout);
+
+            // Imposta una dimensione fissa per il video
+            videoWidget->setMinimumSize(320, 240);
+        } else {
+            videoLayout->addWidget(new QLabel("File video non trovato: " + videoPath));
+        }
+
+        hLayout->addLayout(videoLayout);
+    }
 
     mainLayout->addLayout(hLayout);
 }
