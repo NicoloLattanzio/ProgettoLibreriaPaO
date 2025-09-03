@@ -31,14 +31,15 @@ void DatabaseSaveVisitor::visit(const Library::Book& book) {
 void DatabaseSaveVisitor::visit(const Library::Movie& movie) {
     QSqlQuery query;
     query.prepare(
-        "INSERT OR REPLACE INTO Movies (item_id, language, min_age, duration, oscar) "
-        "VALUES (:id, :language, :min_age, :duration, :oscar)"
+        "INSERT OR REPLACE INTO Movies (item_id, language, min_age, duration, oscar, trailer) "
+        "VALUES (:id, :language, :min_age, :duration, :oscar, :trailer)"
     );
     query.bindValue(":id", m_itemId);
     query.bindValue(":language", QString::fromStdString(movie.getLanguage()));
     query.bindValue(":min_age", movie.getMinAge());
     query.bindValue(":duration", movie.getDuration());
     query.bindValue(":oscar", movie.getOscar());
+    query.bindValue(":trailer", QString::fromStdString(movie.getTrailer()));
 
     qDebug() << "Visitor: Saving Movie data for item ID:" << m_itemId;
     if (!query.exec()) {

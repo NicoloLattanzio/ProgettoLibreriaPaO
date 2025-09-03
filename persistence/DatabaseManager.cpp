@@ -69,6 +69,7 @@ bool DatabaseManager::initialize(const QString& path) {
         "   min_age INTEGER,"
         "   duration INTEGER,"
         "   oscar BOOLEAN,"
+        "   trailer TEXT,"
         "   FOREIGN KEY(item_id) REFERENCES Items(id) ON DELETE CASCADE"
         ");"
     );
