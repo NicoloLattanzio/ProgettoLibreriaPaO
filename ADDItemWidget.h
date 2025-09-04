@@ -3,14 +3,14 @@
 
 #include <QWidget>
 #include <QVector>
-#include <string> // <-- INCLUSIONE MANCANTE
+#include <string>
 #include "model/Item.h"
 #include "model/Visitor.h"
 
-// Definizione del tipo 'String'
+
 using String = std::string;
 
-// Forward declarations
+
 class QLineEdit;
 class QSpinBox;
 class QCheckBox;
@@ -18,7 +18,7 @@ class QComboBox;
 class QPushButton;
 
 class ADDItemWidget : public QWidget, public ItemsVisitor::Visitor {
-    Q_OBJECT // <-- Assicurati che Q_OBJECT sia presente
+    Q_OBJECT
 
 public:
     explicit ADDItemWidget(QWidget *parent = nullptr);
@@ -30,7 +30,7 @@ public:
     void visit(Library::Movie& movie) override;
     void visit(Library::CD& cd) override;
 
-signals: // <-- SEZIONE MANCANTE O SCRITTA MALE
+signals:
     void saveClicked();
     void cancelClicked();
 
@@ -50,7 +50,7 @@ private:
     QSpinBox *m_yearEdit;
     QLineEdit *m_imageEdit;
 
-    // ... altri campi specifici ...
+    // Campi dati specifici
     QWidget *m_bookFields, *m_movieFields, *m_cdFields;
     QLineEdit *m_publisherEdit, *m_translatorEdit;
     QSpinBox *m_pagesEdit;

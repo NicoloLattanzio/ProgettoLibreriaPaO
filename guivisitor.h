@@ -20,12 +20,14 @@ public:
     void visit(const Library::Movie& movie);
     void visit(const Library::CD& cd);
     void clear();
+    QIcon getIcon() const;
     QWidget* getResultWidget() const { return resultWidget; }
 
 private:
     QWidget* resultWidget;
     QVBoxLayout* mainLayout;
     QMediaPlayer *player;
+    QIcon *m_icon;
 };
 
 #endif // GUIVISITOR_H

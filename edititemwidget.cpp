@@ -23,7 +23,8 @@ EditItemWidget::EditItemWidget(QWidget *parent) :
 
     setupUI();
 
-    // Creazione Prototipi per il Visitor
+
+
     m_prototypes.append(new Library::Book());
     m_prototypes.append(new Library::Movie());
     m_prototypes.append(new Library::CD());

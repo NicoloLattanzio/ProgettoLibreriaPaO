@@ -19,7 +19,7 @@ ADDItemWidget::ADDItemWidget(QWidget *parent) : QWidget(parent) {
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
-    // 1. Creazione UI
+    //Creazione UI
     m_typeComboBox = new QComboBox(this);
     m_typeComboBox->addItem("Libro");
     m_typeComboBox->addItem("Film");
@@ -38,17 +38,16 @@ ADDItemWidget::ADDItemWidget(QWidget *parent) : QWidget(parent) {
     buttonLayout->addWidget(cancelButton);
     mainLayout->addLayout(buttonLayout);
 
-    // 2. Creazione Prototipi per il Visitor
     m_prototypes.append(new Library::Book());
     m_prototypes.append(new Library::Movie());
     m_prototypes.append(new Library::CD());
 
-    // 3. Connessioni dei segnali
+    //Connessioni dei segnali
     connect(m_typeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ADDItemWidget::onTypeChanged);
     connect(saveButton, &QPushButton::clicked, this, &ADDItemWidget::saveClicked);
     connect(cancelButton, &QPushButton::clicked, this, &ADDItemWidget::cancelClicked);
 
-    // 4. Impostazione dello stato iniziale della UI
+    //Impostazione dello stato iniziale della UI
     onTypeChanged(0);
 }
 
@@ -56,16 +55,16 @@ ADDItemWidget::~ADDItemWidget() {
     qDeleteAll(m_prototypes);
 }
 
-// --- Implementazione Metodi Visitor ---
-void ADDItemWidget::visit(Library::Book& /*book*/) {
+// Metodi Visitor
+void ADDItemWidget::visit(Library::Book&) {
     showSpecificFields(0);
 }
 
-void ADDItemWidget::visit(Library::Movie& /*movie*/) {
+void ADDItemWidget::visit(Library::Movie&) {
     showSpecificFields(1);
 }
 
-void ADDItemWidget::visit(Library::CD& /*cd*/) {
+void ADDItemWidget::visit(Library::CD&) {
     showSpecificFields(2);
 }
 
@@ -73,7 +72,7 @@ void ADDItemWidget::onTypeChanged(int index) {
     if (index < 0 || index >= m_prototypes.size()) return;
 
     Library::Item* prototype = m_prototypes[index];
-    prototype->accept(*this); // 'this' è il Visitor
+    prototype->accept(*this);
 }
 
 void ADDItemWidget::showSpecificFields(int index) {
@@ -82,7 +81,7 @@ void ADDItemWidget::showSpecificFields(int index) {
     m_cdFields->setVisible(index == 2);
 }
 
-// --- Implementazione Metodi Principali --- // RIVEDERE QUESTA FUNZIONE
+ // RIVEDERE QUESTA FUNZIONE
 Library::Item* ADDItemWidget::createItem() {
     if (m_titleEdit->text().isEmpty()) {
         QMessageBox::warning(this, "Dati Mancanti", "Il campo Titolo è obbligatorio.");
@@ -96,13 +95,13 @@ Library::Item* ADDItemWidget::createItem() {
     unsigned int year = m_yearEdit->value();
     String image = m_imageEdit->text().toStdString();
 
-    if (typeIndex == 0) { // Libro
+    if (typeIndex == 0) {
         return new Library::Book(author, title, 0, genre, year, image,
                                  m_publisherEdit->text().toStdString(),
                                  m_translatorEdit->text().toStdString(),
                                  m_pagesEdit->value());
 
-    } else if (typeIndex == 1) { // Film
+    } else if (typeIndex == 1) {
         return new Library::Movie(author, title, 0, genre, year, image,
                                   m_movieLanguageEdit->text().toStdString(),
                                   m_minAgeEdit->value(),
@@ -110,7 +109,7 @@ Library::Item* ADDItemWidget::createItem() {
                                   m_oscarCheckBox->isChecked(),
                                   m_movieTrailerEdit->text().toStdString());
 
-    } else if (typeIndex == 2) { // CD
+    } else if (typeIndex == 2) {
         return new Library::CD(author, title, 0, genre, year, image,
                                m_cdLanguageEdit->text().toStdString(),
                                m_albumEdit->text().toStdString(),
@@ -121,7 +120,6 @@ Library::Item* ADDItemWidget::createItem() {
 }
 
 
-// --- Implementazione Metodi di Setup UI ---
 void ADDItemWidget::setupCommonFields() {
     QFormLayout *formLayout = new QFormLayout();
     m_titleEdit = new QLineEdit(this);

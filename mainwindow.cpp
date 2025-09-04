@@ -12,6 +12,9 @@
 #include <QVariant>
 #include <QApplication>
 #include <QStyleFactory>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 
 // necessario per QVariant con puntatori custom
 Q_DECLARE_METATYPE(Library::Item*)
@@ -20,25 +23,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_dbManager(DatabaseManager::instance())
 {
-    QApplication::setStyle(QStyleFactory::create("Fusion"));
-
-       // Modifica la palette dei colori per un look più moderno
-       QPalette darkPalette;
-       darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
-       darkPalette.setColor(QPalette::WindowText, Qt::white);
-       darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
-       darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-       darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-       darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-       darkPalette.setColor(QPalette::Text, Qt::white);
-       darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
-       darkPalette.setColor(QPalette::ButtonText, Qt::white);
-       darkPalette.setColor(QPalette::BrightText, Qt::red);
-       darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-       darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-       darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
-       QApplication::setPalette(darkPalette);
     setupUi();
 
     // Connessioni
@@ -57,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_editItemWidget, &EditItemWidget::cancelClicked, this, &MainWindow::showListPage);
     connect(m_editButton, &QPushButton::clicked, this, &MainWindow::ShowEditPage);
 
+    connect(m_importButton, &QPushButton::clicked, this, &MainWindow::importDatabase);
 
     // Caricamento dati dal DB
     if (!m_dbManager.initialize("library.db")) {
@@ -84,6 +69,8 @@ void MainWindow::setupUi() {
     searchLineEdit = new QLineEdit(this);
     searchLineEdit->setPlaceholderText("Cerca per titolo, autore o genere...");
     m_addButton = new QPushButton("Aggiungi Item", this);
+    m_importButton = new QPushButton("Import Database", this);
+    topLayout->addWidget(m_importButton);
     topLayout->addWidget(searchLineEdit);
     topLayout->addWidget(m_addButton);
     mainLayout->addWidget(topControls);
@@ -229,14 +216,14 @@ void MainWindow::populateListWidget() {
     itemsListWidget->clear();
 
     for (Library::Item* item : m_items) {
-        QString displayText = QString("%1\n%2 - %3")
-            .arg(QString::fromStdString(item->getTitle()),
-                 QString::fromStdString(item->getAuthor()),
-                 QString::number(item->getYear()));
+        ListItemVisitor visitor;
+        item->accept(visitor);
 
-        QListWidgetItem* listItem = new QListWidgetItem(displayText);
-        listItem->setData(Qt::UserRole, QVariant::fromValue(item));
-        itemsListWidget->addItem(listItem);
+        QListWidgetItem* listItem = visitor.getListWidgetItem();
+        if (listItem) {
+            listItem->setData(Qt::UserRole, QVariant::fromValue(item));
+            itemsListWidget->addItem(listItem);
+        }
     }
 }
 
@@ -259,6 +246,41 @@ void MainWindow::onListItemClicked(QListWidgetItem* item) {
 
     m_editButton->setEnabled(true);
     m_deleteButton->setEnabled(true);
+}
+
+void MainWindow::importDatabase() {
+    QString fileName = QFileDialog::getOpenFileName(this,
+        "Select Database File", "", "Database Files (*.db)");
+
+    if (fileName.isEmpty()) return;
+
+    // Close current database
+    m_dbManager.closeDatabase();
+
+    // Get the path to our current database
+    QString currentDbPath = "library.db";
+
+    // Backup current database
+    QFile::rename(currentDbPath, currentDbPath + ".backup");
+
+    // Copy the selected database file
+    if (QFile::copy(fileName, currentDbPath)) {
+        if (m_dbManager.initialize(currentDbPath)) {
+            QMessageBox::information(this, "Success", "Database imported successfully");
+            loadItemsFromDatabase();
+        } else {
+            // Restore backup if import fails
+            QFile::remove(currentDbPath);
+            QFile::rename(currentDbPath + ".backup", currentDbPath);
+            m_dbManager.initialize(currentDbPath);
+            QMessageBox::warning(this, "Error", "Failed to open imported database");
+        }
+    } else {
+        // Restore backup if copy fails
+        QFile::rename(currentDbPath + ".backup", currentDbPath);
+        m_dbManager.initialize(currentDbPath);
+        QMessageBox::warning(this, "Error", "Failed to copy database file");
+    }
 }
 
 void MainWindow::DeleteOnClick() {

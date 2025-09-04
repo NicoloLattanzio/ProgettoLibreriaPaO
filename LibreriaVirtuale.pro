@@ -6,6 +6,7 @@ CONFIG += c++11
 SOURCES += \
     ADDItemWidget.cpp \
     edititemwidget.cpp \
+    listitemvisitor.cpp \
     main.cpp \
     mainwindow.cpp \
     guivisitor.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 HEADERS += \
     ADDItemWidget.h \
     edititemwidget.h \
+    listitemvisitor.h \
     mainwindow.h \
     guivisitor.h \
     persistence/DatabaseManager.h \
@@ -43,3 +45,5 @@ FORMS += $${view_FORMS}
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += icons.qrc

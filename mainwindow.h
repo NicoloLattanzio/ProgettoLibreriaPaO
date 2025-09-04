@@ -9,6 +9,7 @@
 #include "ADDItemWidget.h"
 #include "model/Item.h"
 #include "edititemwidget.h"
+#include "listitemvisitor.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -26,6 +27,7 @@ private slots:
     void DeleteOnClick();
     void ShowEditPage();
     void saveEditedItem();
+    void importDatabase();
 
 private:
     void setupUi();
@@ -40,6 +42,7 @@ private:
     QPushButton* m_addButton;
     QPushButton* m_editButton;
     QPushButton* m_deleteButton;
+    QPushButton *m_importButton;
 
     QStackedWidget* m_stackedWidget;
     QWidget* m_listPage;
