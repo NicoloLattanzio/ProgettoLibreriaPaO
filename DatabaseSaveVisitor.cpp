@@ -1,0 +1,74 @@
+#include "DatabaseSaveVisitor.h"
+#include "DatabaseManager.h"
+#include "model/Book.h"
+#include "model/Movie.h"
+#include "model/CD.h"
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+#include <stdexcept>
+
+DatabaseSaveVisitor::DatabaseSaveVisitor(int itemId) : m_itemId(itemId) {}
+
+void DatabaseSaveVisitor::visit(const Library::Book& book) {
+    QSqlDatabase db = DatabaseManager::instance().database();
+    QSqlQuery query(db);
+    query.prepare(
+        "INSERT OR REPLACE INTO Books (item_id, publisher, translator, pages) "
+        "VALUES (:id, :publisher, :translator, :pages)"
+    );
+    query.bindValue(":id", m_itemId);
+    query.bindValue(":publisher", QString::fromStdString(book.getPublisher()));
+    query.bindValue(":translator", QString::fromStdString(book.getTranslator()));
+    query.bindValue(":pages", book.getPages());
+
+    qDebug() << "Visitor: Saving Book data for item ID:" << m_itemId;
+    if (!query.exec()) {
+        qDebug() << "Visitor ERROR: Failed to execute Book insert/replace for item ID" << m_itemId << ":" << query.lastError().text();
+        throw query.lastError();
+    }
+    qDebug() << "Visitor: Successfully saved Book data for item ID:" << m_itemId;
+}
+
+void DatabaseSaveVisitor::visit(const Library::Movie& movie) {
+    QSqlDatabase db = DatabaseManager::instance().database();
+    QSqlQuery query(db);
+    query.prepare(
+        "INSERT OR REPLACE INTO Movies (item_id, language, min_age, duration, oscar, trailer) "
+        "VALUES (:id, :language, :min_age, :duration, :oscar, :trailer)"
+    );
+    query.bindValue(":id", m_itemId);
+    query.bindValue(":language", QString::fromStdString(movie.getLanguage()));
+    query.bindValue(":min_age", movie.getMinAge());
+    query.bindValue(":duration", movie.getDuration());
+    query.bindValue(":oscar", movie.getOscar());
+    query.bindValue(":trailer", QString::fromStdString(movie.getTrailer()));
+
+    qDebug() << "Visitor: Saving Movie data for item ID:" << m_itemId;
+    if (!query.exec()) {
+        qDebug() << "Visitor ERROR: Failed to execute Movie insert/replace for item ID" << m_itemId << ":" << query.lastError().text();
+        throw query.lastError();
+    }
+    qDebug() << "Visitor: Successfully saved Movie data for item ID:" << m_itemId;
+}
+
+void DatabaseSaveVisitor::visit(const Library::CD& cd) {
+    QSqlDatabase db = DatabaseManager::instance().database();
+    QSqlQuery query(db);
+    query.prepare(
+        "INSERT OR REPLACE INTO CDs (item_id, language, album, duration, audio_track) "
+        "VALUES (:id, :language, :album, :duration, :audio_track)"
+    );
+    query.bindValue(":id", m_itemId);
+    query.bindValue(":language", QString::fromStdString(cd.getLanguage()));
+    query.bindValue(":album", QString::fromStdString(cd.getAlbum()));
+    query.bindValue(":duration", cd.getDuration());
+    query.bindValue(":audio_track", QString::fromStdString(cd.getaudioTrack()));
+
+    qDebug() << "Visitor: Saving CD data for item ID:" << m_itemId;
+    if (!query.exec()) {
+        qDebug() << "Visitor ERROR: Failed to execute CD insert/replace for item ID" << m_itemId << ":" << query.lastError().text();
+        throw query.lastError();
+    }
+    qDebug() << "Visitor: Successfully saved CD data for item ID:" << m_itemId;
+}
