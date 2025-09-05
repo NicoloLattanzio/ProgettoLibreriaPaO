@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_editButton, &QPushButton::clicked, this, &MainWindow::ShowEditPage);
 
     connect(m_importButton, &QPushButton::clicked, this, &MainWindow::importDatabase);
+    connect(m_themeButton, &QPushButton::clicked, this, &MainWindow::ChangeTheme);
 
     // Caricamento dati dal DB
     if (!m_dbManager.initialize("library.db")) {
@@ -57,6 +58,23 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setupUi() {
+    qApp->setStyle(QStyleFactory::create("Fusion"));
+        QPalette darkPalette;
+        darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
+        darkPalette.setColor(QPalette::WindowText, Qt::white);
+        darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
+        darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+        darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+        darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+        darkPalette.setColor(QPalette::Text, Qt::white);
+        darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
+        darkPalette.setColor(QPalette::ButtonText, Qt::white);
+        darkPalette.setColor(QPalette::BrightText, Qt::red);
+        darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
+        darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+        darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+        darkPalette.setColor(QPalette::PlaceholderText, Qt::white);
+        qApp->setPalette(darkPalette);
     setWindowTitle("Library Manager");
     resize(900, 600);
     QWidget *centralWidget = new QWidget(this);
@@ -64,16 +82,21 @@ void MainWindow::setupUi() {
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
 
     // --- Controlli superiori ---
-    QWidget* topControls = new QWidget(this);
-    QHBoxLayout* topLayout = new QHBoxLayout(topControls);
-    searchLineEdit = new QLineEdit(this);
-    searchLineEdit->setPlaceholderText("Cerca per titolo, autore o genere...");
-    m_addButton = new QPushButton("Aggiungi Item", this);
-    m_importButton = new QPushButton("Import Database", this);
-    topLayout->addWidget(m_importButton);
-    topLayout->addWidget(searchLineEdit);
-    topLayout->addWidget(m_addButton);
-    mainLayout->addWidget(topControls);
+    QHBoxLayout* importThemeLayout = new QHBoxLayout();
+    m_importButton = new QPushButton("Importa Database");
+    m_themeButton = new QPushButton("Cambia Tema");
+    importThemeLayout->addWidget(m_importButton);
+    importThemeLayout->addWidget(m_themeButton);
+    mainLayout->addLayout(importThemeLayout);
+
+    // Barra di ricerca con pulsante Aggiungi Item
+        QHBoxLayout* searchLayout = new QHBoxLayout();
+        searchLineEdit = new QLineEdit(this);
+        searchLineEdit->setPlaceholderText("Cerca per titolo, autore o genere...");
+        m_addButton = new QPushButton("Aggiungi Item", this);
+        searchLayout->addWidget(searchLineEdit);
+        searchLayout->addWidget(m_addButton);
+        mainLayout->addLayout(searchLayout);
 
     // --- Stack ---
     m_stackedWidget = new QStackedWidget(this);
@@ -254,32 +277,46 @@ void MainWindow::importDatabase() {
 
     if (fileName.isEmpty()) return;
 
-    // Close current database
+    // Chiudi il database corrente
     m_dbManager.closeDatabase();
 
-    // Get the path to our current database
     QString currentDbPath = "library.db";
 
-    // Backup current database
-    QFile::rename(currentDbPath, currentDbPath + ".backup");
+    // Backup del database corrente
+    if (QFile::exists(currentDbPath)) {
+        if (QFile::exists(currentDbPath + ".backup")) {
+            QFile::remove(currentDbPath + ".backup");
+        }
+        QFile::rename(currentDbPath, currentDbPath + ".backup");
+    }
 
-    // Copy the selected database file
+    // Copia il nuovo database
     if (QFile::copy(fileName, currentDbPath)) {
+        QFile::setPermissions(currentDbPath,
+            QFile::ReadOwner | QFile::WriteOwner |
+            QFile::ReadGroup | QFile::WriteGroup |
+            QFile::ReadOther | QFile::WriteOther);
+
+        // Inizializza il nuovo database
         if (m_dbManager.initialize(currentDbPath)) {
-            QMessageBox::information(this, "Success", "Database imported successfully");
+            QMessageBox::information(this, "Successo", "Database importato con successo");
             loadItemsFromDatabase();
         } else {
-            // Restore backup if import fails
+            // Ripristina il backup in caso di errore
             QFile::remove(currentDbPath);
-            QFile::rename(currentDbPath + ".backup", currentDbPath);
+            if (QFile::exists(currentDbPath + ".backup")) {
+                QFile::rename(currentDbPath + ".backup", currentDbPath);
+            }
             m_dbManager.initialize(currentDbPath);
-            QMessageBox::warning(this, "Error", "Failed to open imported database");
+            QMessageBox::warning(this, "Errore", "Impossibile aprire il database importato");
         }
     } else {
-        // Restore backup if copy fails
-        QFile::rename(currentDbPath + ".backup", currentDbPath);
+        // Ripristina il backup in caso di errore di copia
+        if (QFile::exists(currentDbPath + ".backup")) {
+            QFile::rename(currentDbPath + ".backup", currentDbPath);
+        }
         m_dbManager.initialize(currentDbPath);
-        QMessageBox::warning(this, "Error", "Failed to copy database file");
+        QMessageBox::warning(this, "Errore", "Impossibile copiare il file del database");
     }
 }
 
@@ -307,7 +344,7 @@ void MainWindow::DeleteOnClick() {
 
     if (reply == QMessageBox::Yes) {
         // Delete from database using the reference to the item
-        if (m_dbManager.DeleteItem(*libraryItem)) {
+        if (m_dbManager.deleteItem(*libraryItem)) {
             // Remove from our local list
             for (auto it = m_items.begin(); it != m_items.end(); ++it) {
                 if (*it == libraryItem) {
@@ -341,5 +378,22 @@ void MainWindow::DeleteOnClick() {
         } else {
             QMessageBox::warning(this, "Errore", "Impossibile eliminare l'elemento dal database.");
         }
+    }
+}
+void MainWindow::ChangeTheme() {
+    // Ottiene il foglio di stile corrente
+    QString currentStyleSheet = qApp->styleSheet();
+
+    if (currentStyleSheet.isEmpty()) {
+        // Tema bianco (default), passa al tema scuro
+        qApp->setStyleSheet("QWidget { background-color: #333; color: #EEE; }"
+                            "QPushButton { background-color: #555; border: 1px solid #777; }"
+                            "QLineEdit, QListWidget, QSpinBox, QDateEdit, QComboBox { background-color: #444; color: #FFF; }"
+                            "QScrollBar::handle:vertical { background: #555; }"
+                            "QScrollBar::handle:horizontal { background: #555; }"
+                            "QToolTip { background-color: black; color: white; border: black solid 1px}");
+    } else {
+        // Tema scuro, torna al tema bianco (default)
+        qApp->setStyleSheet("");
     }
 }

@@ -28,6 +28,8 @@ private slots:
     void ShowEditPage();
     void saveEditedItem();
     void importDatabase();
+    void ChangeTheme();
+
 
 private:
     void setupUi();
@@ -43,6 +45,7 @@ private:
     QPushButton* m_editButton;
     QPushButton* m_deleteButton;
     QPushButton *m_importButton;
+    QPushButton* m_themeButton;
 
     QStackedWidget* m_stackedWidget;
     QWidget* m_listPage;

@@ -35,7 +35,7 @@ void GUIVisitor::visit(const Library::Book& book) {
 
     QHBoxLayout* hLayout = new QHBoxLayout();
 
-    QString path = QCoreApplication::applicationDirPath() + "/images/" +
+    QString path = QCoreApplication::applicationDirPath() + "/Resources/images/" +
                    QString::fromStdString(book.getImage());
     QLabel* imageLabel = new QLabel;
     qDebug() << "Percorso immagine (dal DB):" << path;
@@ -68,7 +68,7 @@ void GUIVisitor::visit(const Library::Movie& movie) {
     clear();
 
     QHBoxLayout* hLayout = new QHBoxLayout();
-    QString path = QCoreApplication::applicationDirPath() + "/images/" +
+    QString path = QCoreApplication::applicationDirPath() + "/Resources/images/" +
                    QString::fromStdString(movie.getImage());
     QLabel* imageLabel = new QLabel;
     QPixmap image(path);
@@ -102,7 +102,7 @@ void GUIVisitor::visit(const Library::Movie& movie) {
         player->setVideoOutput(videoWidget);
 
         // Costruisci il percorso del file video
-        QString videoPath = QCoreApplication::applicationDirPath() + "/trailer/" +
+        QString videoPath = QCoreApplication::applicationDirPath() + "/Resources/trailer/" +
                            QString::fromStdString(movie.getTrailer());
 
         // Verifica se il file esiste
@@ -169,7 +169,7 @@ void GUIVisitor::visit(const Library::CD& cd) {
 
     QHBoxLayout* hLayout = new QHBoxLayout();
 
-    QString path = QCoreApplication::applicationDirPath() + "/images/" +
+    QString path = QCoreApplication::applicationDirPath() + "/Resources/images/" +
                    QString::fromStdString(cd.getImage());
     QLabel* imageLabel = new QLabel;
     QPixmap image(path);
@@ -205,7 +205,7 @@ void GUIVisitor::visit(const Library::CD& cd) {
         audioOutput->setVolume(50);
 
         // Costruisci il percorso del file audio
-        QString audioPath = QCoreApplication::applicationDirPath() + "/audio/" +
+        QString audioPath = QCoreApplication::applicationDirPath() + "/Resources/audio/" +
                            QString::fromStdString(cd.getaudioTrack());
 
         // Verifica se il file esiste

@@ -9,7 +9,9 @@ void ListItemVisitor::visit(const Library::Book& book) {
              QString::fromStdString(book.getAuthor()),
              QString::number(book.getYear()));
 
-    m_listItem = new QListWidgetItem(QIcon(":/icons/images/IconBook.png"), displayText);
+    QSize iconSize(56, 56); // Aumenta le dimensioni a 32x32 pixel
+    m_listItem = new QListWidgetItem(QIcon(":/icons/Resources/images/IconBook.png"), displayText);
+    m_listItem->setData(Qt::DecorationRole, QIcon(":/icons/Resources/images/IconBook.png").pixmap(iconSize));
 }
 
 void ListItemVisitor::visit(const Library::Movie& movie) {
@@ -18,7 +20,9 @@ void ListItemVisitor::visit(const Library::Movie& movie) {
              QString::fromStdString(movie.getAuthor()),
              QString::number(movie.getYear()));
 
-    m_listItem = new QListWidgetItem(QIcon(":/icons/images/IconMovie.png"), displayText);
+    QSize iconSize(56, 56); // Aumenta le dimensioni a 32x32 pixel
+    m_listItem = new QListWidgetItem(QIcon(":/icons/Resources/images/IconMovie.png"), displayText);
+    m_listItem->setData(Qt::DecorationRole, QIcon(":/icons/Resources/images/IconMovie.png").pixmap(iconSize));
 }
 
 void ListItemVisitor::visit(const Library::CD& cd) {
@@ -27,5 +31,7 @@ void ListItemVisitor::visit(const Library::CD& cd) {
              QString::fromStdString(cd.getAuthor()),
              QString::number(cd.getYear()));
 
-    m_listItem = new QListWidgetItem(QIcon(":/icons/images/IconCD.png"), displayText);
+    QSize iconSize(56, 56); // Aumenta le dimensioni a 32x32 pixel
+    m_listItem = new QListWidgetItem(QIcon(":/icons/Resources/images/IconCD.png"), displayText);
+    m_listItem->setData(Qt::DecorationRole, QIcon(":/icons/Resources/images/IconCD.png").pixmap(iconSize));
 }
