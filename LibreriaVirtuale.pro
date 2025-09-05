@@ -31,7 +31,6 @@ HEADERS += \
     model/Movie.h \
     model/ConstVisitor.h \
     model/Visitor.h \
-    view/AddItemVisitor.h
 
 HEADERS += $${persistence_HEADERS}
 SOURCES += $${persistence_SOURCES}
@@ -48,3 +47,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += icons.qrc \
     icons.qrc
+
